@@ -1,0 +1,95 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+
+    }
+
+    dependencies {
+        classpath "com.moowork.gradle:gradle-node-plugin:1.1.1"
+    }
+}
+apply plugin: 'com.android.application'
+apply plugin: 'com.moowork.gulp'
+apply plugin: 'maven'
+
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "in.ashwanik.staticfilecompressor"
+        minSdkVersion 16
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.android.support:design:25.3.1'
+    testCompile 'junit:junit:4.12'
+}
+
+
+node {
+    // Version of node to use.
+    version = '0.11.10'
+
+    // Version of npm to use.
+    npmVersion = '2.1.5'
+
+    // Version of Yarn to use.
+    yarnVersion = '0.16.1'
+
+    // Base URL for fetching node distributions (change if you have a mirror).
+    distBaseUrl = 'https://nodejs.org/dist'
+
+    // If true, it will download node using above parameters.
+    // If false, it will try to use globally installed node.
+    download = false
+
+    // Set the work directory for unpacking node
+    workDir = file("${project.buildDir}/nodejs")
+
+    // Set the work directory for NPM
+    npmWorkDir = file("${project.buildDir}/npm")
+
+    // Set the work directory for Yarn
+    yarnWorkDir = file("${project.buildDir}/yarn")
+
+    // Set the work directory where node_modules should be located
+    nodeModulesDir = file("${project.projectDir}/gulp-task")
+}
+gulp {
+    // Set the directory where gulpfile.js should be found
+    workDir = file("${project.projectDir}/gulp-task")
+
+    // Whether colors should output on the terminal
+    colors = true
+
+    // Whether output from Gulp should be buffered - useful when running tasks in parallel
+    bufferOutput = false
+}
+
+task minifyStaticResources(type: GulpTask) {
+    args = ["default", "--dest", "${project.projectDir}/src/main/assets", "--src", "${project.projectDir}/static_src"]
+}
+gulp_default.dependsOn 'npmInstall'
+gulp_default.dependsOn 'installGulp'
+build.dependsOn minifyStaticResources

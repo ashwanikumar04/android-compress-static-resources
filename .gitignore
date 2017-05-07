@@ -38,3 +38,14 @@ captures/
 
 # Keystore files
 *.jks
+bin
+gen
+.gradle
+build
+.settings
+target
+*.iml
+.idea
+/app/class_files.txt
+/app/config.txt
+/app/gulp-task/node_modules

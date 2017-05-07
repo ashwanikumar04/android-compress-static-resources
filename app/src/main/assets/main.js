@@ -1,0 +1,1 @@
+function test(o){console.log(o)}test("Hello");
